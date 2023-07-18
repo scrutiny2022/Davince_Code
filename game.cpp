@@ -67,6 +67,8 @@ private :
     char character; //p代表玩家，c代表电脑
 public :
     void drawcardfromDeck(char &color_wanted); //从牌堆中抽牌
+    void print();//输出手中的牌
+    void sortHand();//将手中的牌排序
 };
 void Player::drawcardfromDeck(char &color_wanted){
     //在使用前调用srand(time(0))
@@ -76,8 +78,15 @@ void Player::drawcardfromDeck(char &color_wanted){
     std::cout<<temp.status<<","<<temp.value<<std::endl;
     if (color_wanted == 'b') remainDeck(Black,temp);
     if (color_wanted == 'w') remainDeck(White,temp);
+    hand.push_back(temp);
 }
-
+void Player::print(){
+    for (const auto& card : hand)
+    {
+        if (!card.status) std::cout<<' '<<"\t"<<card.color<<std::endl;
+        if (card.status) std::cout<<card.value<<"\t"<<card.color<<std::endl;
+    }
+}
 
 
 int main(void)
@@ -99,7 +108,11 @@ int main(void)
     char a = 'b', c = 'w';
     player.drawcardfromDeck(a);
     player.drawcardfromDeck(c);
+    player.drawcardfromDeck(a);
+    player.drawcardfromDeck(c);
     White.print();
     Black.print();
+    std::cout<<"player's hand is"<<std::endl;
+    player.print();
     return 0;
 }
