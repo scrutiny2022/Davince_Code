@@ -41,6 +41,7 @@ public:
         }
     }
     Vector & getCardlist(){return cardlist;}//返回一个Vector cardlist的引用
+    void dealCards(Player &player);//发牌
 };
 
 Deck Black,White; //将黑白两牌堆设置成全局变量
@@ -83,7 +84,6 @@ bool compareProperties(const card_property& prop1, const card_property& prop2) {
             return true;
         }
     }
-    
     return false;
 }
 void Player::drawcardfromDeck(char &color_wanted){
@@ -114,7 +114,24 @@ void Player::print(){
 void Player::sortHand(){
     //将牌堆按照从小到大，相同数字白比黑大的规则排列
 }
+void Deck::dealCards(Player &player){
+    //发牌
+    char b = 'b', w = 'w';
+    player.drawcardfromDeck(b);
+    player.drawcardfromDeck(w);
+    player.drawcardfromDeck(b);
+    player.drawcardfromDeck(w);
+    player.print();
+}
 
+class Process{
+private:
+    Player player('p');
+    Player computer('c');
+public:
+    void setup();
+    void run();
+};
 
 int main(void)
 {
