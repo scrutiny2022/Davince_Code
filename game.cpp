@@ -69,6 +69,7 @@ public :
     void drawcardfromDeck(char &color_wanted); //从牌堆中抽牌
     void print();//输出手中的牌
     void sortHand();//将手中的牌排序
+    Vector & getHand(){return hand;}//返回一个Vector hand的引用
 };
 void Player::drawcardfromDeck(char &color_wanted){
     //在使用前调用srand(time(0))
@@ -86,6 +87,10 @@ void Player::print(){
         if (!card.status) std::cout<<' '<<"\t"<<card.color<<std::endl;
         if (card.status) std::cout<<card.value<<"\t"<<card.color<<std::endl;
     }
+}
+void Player::sortHand(){
+    //将牌堆按照从小到大，相同数字白比黑大的规则排列
+    
 }
 
 
