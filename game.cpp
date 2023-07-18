@@ -11,6 +11,7 @@ struct card_property
 {
     int value;
     char color;
+
     int status = 0; //status为1表示牌倒下，被猜中了;0则表示未被猜中
 };
 typedef std::vector<card_property> Vector;
@@ -66,11 +67,25 @@ private :
     Vector hand; //玩家手中的牌
     char character; //p代表玩家，c代表电脑
 public :
+    Player(char charact){
+        character = charact;
+    }
     void drawcardfromDeck(char &color_wanted); //从牌堆中抽牌
     void print();//输出手中的牌
     void sortHand();//将手中的牌排序
     Vector & getHand(){return hand;}//返回一个Vector hand的引用
 };
+bool compareProperties(const card_property& prop1, const card_property& prop2) {
+    if (prop1.value < prop2.value) {
+        return true;
+    } else if (prop1.value == prop2.value) {
+        if (prop1.color == 'b' && prop2.color == 'w') {
+            return true;
+        }
+    }
+    
+    return false;
+}
 void Player::drawcardfromDeck(char &color_wanted){
     //在使用前调用srand(time(0))
     card_property temp;
@@ -84,13 +99,20 @@ void Player::drawcardfromDeck(char &color_wanted){
 void Player::print(){
     for (const auto& card : hand)
     {
-        if (!card.status) std::cout<<' '<<"\t"<<card.color<<std::endl;
-        if (card.status) std::cout<<card.value<<"\t"<<card.color<<std::endl;
+        if (character == 'c') //如果电脑牌被猜中了，则显示数字；反之，不显示
+        {
+            if (card.status) std::cout<<card.value<<"\t"<<card.color<<std::endl;
+            else std::cout<<' '<<"\t"<<card.color<<std::endl;
+        }
+        if (character == 'p')//如果玩家牌被猜中了，则多4个空格；反之，不变
+        {
+            if (!card.status) std::cout<<card.value<<"\t"<<card.color<<std::endl;
+            else std::cout<<"\t"<<card.value<<"\t"<<card.color<<std::endl;
+        }
     }
 }
 void Player::sortHand(){
     //将牌堆按照从小到大，相同数字白比黑大的规则排列
-    
 }
 
 
@@ -108,16 +130,16 @@ int main(void)
     b.value = 3;
     remainDeck(Black,b);
     //Black.print();
-    Player player;
+    Player player('p');
     srand(time(0));
     char a = 'b', c = 'w';
     player.drawcardfromDeck(a);
     player.drawcardfromDeck(c);
     player.drawcardfromDeck(a);
     player.drawcardfromDeck(c);
-    White.print();
-    Black.print();
-    std::cout<<"player's hand is"<<std::endl;
+    //White.print();
+    //Black.print();
+    std::cout<<"computer's hand is"<<std::endl;
     player.print();
     return 0;
 }
