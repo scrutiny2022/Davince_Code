@@ -15,6 +15,29 @@ struct card_property
     int status = 0; //status为1表示牌倒下，被猜中了;0则表示未被猜中
 };
 typedef std::vector<card_property> Vector;
+void swap(card_property &card1, card_property & card2)
+{
+    card_property temp;
+    temp.color = 'y';
+    temp.value = 12;
+    temp = card1;
+    card1 = card2;
+    card2 = temp;
+}
+class Player{
+private :
+    Vector hand; //玩家手中的牌
+    char character; //p代表玩家，c代表电脑
+public :
+    Player(char charact){
+        character = charact;
+    }
+    void drawcardfromDeck(char &color_wanted); //从牌堆中抽牌
+    void print();//输出手中的牌
+    void sortHand();//将手中的牌排序
+    void guessCard(Player &opponent);//猜对手的牌
+    Vector & getHand(){return hand;}//返回一个Vector hand的引用
+};
 
 class Deck{
     //牌堆类，生成白牌和黑牌
@@ -62,21 +85,8 @@ void remainDeck(Deck &whichdeck, const card_property &cardTaken) {
     }
 }
 
-
-class Player{
-private :
-    Vector hand; //玩家手中的牌
-    char character; //p代表玩家，c代表电脑
-public :
-    Player(char charact){
-        character = charact;
-    }
-    void drawcardfromDeck(char &color_wanted); //从牌堆中抽牌
-    void print();//输出手中的牌
-    void sortHand();//将手中的牌排序
-    Vector & getHand(){return hand;}//返回一个Vector hand的引用
-};
 bool compareProperties(const card_property& prop1, const card_property& prop2) {
+    //如果prop2排在prop1后面，也就是说prop2 > prop1, 返回 true
     if (prop1.value < prop2.value) {
         return true;
     } else if (prop1.value == prop2.value) {
@@ -86,6 +96,7 @@ bool compareProperties(const card_property& prop1, const card_property& prop2) {
     }
     return false;
 }
+
 void Player::drawcardfromDeck(char &color_wanted){
     //在使用前调用srand(time(0))
     card_property temp;
@@ -113,6 +124,14 @@ void Player::print(){
 }
 void Player::sortHand(){
     //将牌堆按照从小到大，相同数字白比黑大的规则排列
+    bool result = true;
+    int i = 0;
+    card_property temp;
+    for(i = 0; i < hand.size()-1; i ++)
+    {
+        result = compareProperties(hand[i],hand[i+1]);
+        if (!result) swap(hand[i],hand[i+1]);
+    }
 }
 void Deck::dealCards(Player &player){
     //发牌
@@ -126,10 +145,13 @@ void Deck::dealCards(Player &player){
 
 class Process{
 private:
-    Player player('p');
-    Player computer('c');
+    Player player;
+    Player computer;
 public:
-    void setup();
+    void setup() {
+        player = Player('p');
+        computer = Player('c');
+    }
     void run();
 };
 
@@ -142,21 +164,24 @@ int main(void)
     White.create_vector('w');
     //White.print();
     std::cout<<"after removing"<<std::endl;
-    card_property b;
+    card_property b,d;
     b.color = 'b';
     b.value = 3;
+    d.color = 'w';
+    d.value = 6;
     remainDeck(Black,b);
     //Black.print();
     Player player('p');
     srand(time(0));
-    char a = 'b', c = 'w';
-    player.drawcardfromDeck(a);
-    player.drawcardfromDeck(c);
-    player.drawcardfromDeck(a);
-    player.drawcardfromDeck(c);
+    Black.dealCards(player);
     //White.print();
     //Black.print();
     std::cout<<"computer's hand is"<<std::endl;
+    player.print();
+    bool result = 0;
+    result = compareProperties(b,d);
+    std::cout<<result<<std::endl;
+    player.sortHand();
     player.print();
     return 0;
 }
