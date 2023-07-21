@@ -11,7 +11,6 @@ struct card_property
 {
     int value;
     char color;
-
     int status = 0; //status为1表示牌倒下，被猜中了;0则表示未被猜中
 };
 typedef std::vector<card_property> Vector;
@@ -29,6 +28,7 @@ private :
     Vector hand; //玩家手中的牌
     char character; //p代表玩家，c代表电脑
 public :
+    Player() {}
     Player(char charact){
         character = charact;
     }
@@ -64,17 +64,17 @@ public:
         }
     }
     Vector & getCardlist(){return cardlist;}//返回一个Vector cardlist的引用
-    void dealCards(Player &player);//发牌
+    //void dealCards(Player &player);//发牌
 };
 
 Deck Black,White; //将黑白两牌堆设置成全局变量
 
 void remainDeck(Deck &whichdeck, const card_property &cardTaken) {
+    //@param:第一个参数是牌堆，cardTaken是要去掉的那张牌
+    //@return: 返回的是去掉cardTaken这张牌之后的牌堆
     //要想使得remainDeck(c,cardTaken)可以运行，第一个参数就得是Deck类，并在函数体的第一步得到Vector的引用
     //所以要加一句 Vector & deck = whichdeck.getCardlist();
     //从牌堆中减掉一张牌
-    //第一个参数是牌堆，cardTaken是要去掉的那张牌
-    //返回的是去掉cardTaken这张牌之后的牌堆
     Vector & deck = whichdeck.getCardlist();
     auto it = std::find_if(deck.begin(), deck.end(), [&](const card_property& card) {
         return card.value == cardTaken.value && card.color == cardTaken.color;
@@ -125,15 +125,40 @@ void Player::print(){
 void Player::sortHand(){
     //将牌堆按照从小到大，相同数字白比黑大的规则排列
     bool result = true;
-    int i = 0;
+    int i = 0, j = 1;
     card_property temp;
     for(i = 0; i < hand.size()-1; i ++)
     {
-        result = compareProperties(hand[i],hand[i+1]);
-        if (!result) swap(hand[i],hand[i+1]);
+        for (j = i+1; j < hand.size(); j++)
+        {
+            result = compareProperties(hand[i],hand[j]);
+            if (!result) swap(hand[i],hand[j]);
+        }
     }
 }
-void Deck::dealCards(Player &player){
+void Player::guessCard(Player &opponent)
+{
+    //猜对方的牌
+    card_property temp;
+    Vector & opponent_hand = opponent.getHand();
+    int index = 0;
+    bool continue_guessing = true;
+    std::cin>>continue_guessing;
+    while (continue_guessing)
+    {
+        std::cout<<"Please input the index of the card(start from 0) you want to guess"<<std::endl;
+        std::cin>>index;
+        std::cout<<"Please input the value you guess"<<std::endl;
+        std::cin>>temp.value;
+        temp.color = opponent_hand[index].color;
+        if (temp.value == opponent_hand[index].value) opponent_hand[index].status = 1;
+        else hand[hand.size()-1].status = 1;//倒下自己新拿的牌
+        std::cout<<"continue or not? 1 for continue and 0 for not"<<std::endl;
+        std::cin>>continue_guessing;
+    }
+
+}
+void dealCards(Player &player){
     //发牌
     char b = 'b', w = 'w';
     player.drawcardfromDeck(b);
@@ -154,7 +179,18 @@ public:
     }
     void run();
 };
-
+void Process::run()
+{
+    dealCards(player);
+    dealCards(computer);
+    char color_wanted;
+    std::cout<<"what color you want to draw"<<std::endl;
+    std::cin>>color_wanted;
+    player.drawcardfromDeck(color_wanted);
+    player.guessCard(computer);
+    computer.drawcardfromDeck(color_wanted);
+    computer.guessCard(player);
+}
 int main(void)
 {
     Black.create_empty_vector(); //Black是黑色牌堆
@@ -173,14 +209,10 @@ int main(void)
     //Black.print();
     Player player('p');
     srand(time(0));
-    Black.dealCards(player);
+    dealCards(player);
     //White.print();
     //Black.print();
     std::cout<<"computer's hand is"<<std::endl;
-    player.print();
-    bool result = 0;
-    result = compareProperties(b,d);
-    std::cout<<result<<std::endl;
     player.sortHand();
     player.print();
     return 0;
