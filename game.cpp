@@ -1,4 +1,5 @@
 //达芬奇密码 C++版
+//缺： 电脑猜牌的逻辑computer.guesscard(player)
 #include<iostream>
 #include<vector>
 #include<string>
@@ -25,7 +26,7 @@ void swap(card_property &card1, card_property & card2)
 }
 class Player{
 private :
-    Vector hand; //玩家手中的牌
+    Vector hand; //手中的牌
     char character; //p代表玩家，c代表电脑
 public :
     Player() {}
